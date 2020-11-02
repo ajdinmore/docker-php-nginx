@@ -50,6 +50,7 @@ RUN rm /etc/php/${PHP_VERSION}/fpm/pool.d/www.confe
 ## Install Composer
 RUN php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }"
 RUN php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+RUN composer config -g cache-dir /composer_cache
 RUN rm /tmp/*
 
 ## On run, create file descriptors 3 & 4 as aliases for stdout and stderr, allow all to write to it,
