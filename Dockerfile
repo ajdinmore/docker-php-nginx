@@ -7,7 +7,7 @@ WORKDIR /app
 RUN apt-get -qy update
 RUN apt-get -qy install apt-transport-https lsb-release ca-certificates curl
 RUN curl -sSLo /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-RUN sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 
 ## Install Lighttpd
 RUN apt-get -qy install lighttpd
@@ -39,11 +39,11 @@ RUN apt-get -qy install \
     php${PHP_VERSION}-intl
 
 ## Update PHP config
-RUN sed -ie 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=1/' /etc/php/${PHP_VERSION}/fpm/php.ini
-RUN sed -ie 's/zlib.output_compression = Off/zlib.output_compression = On/' /etc/php/${PHP_VERSION}/fpm/php.ini
-RUN sed -ie 's/;clear_env = no/clear_env = no/' /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
-RUN sed -ie 's/listen = \/run\/php\/php${PHP_VERSION}-fpm.sock/listen = \/run\/php-fpm.sock/' /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
-RUN sed -ie 's/pid = \/run\/php\/php${PHP_VERSION}-fpm.pid/pid = \/run\/php-fpm.pid/' /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
+RUN sed -ie "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=1/" /etc/php/${PHP_VERSION}/fpm/php.ini
+RUN sed -ie "s/zlib.output_compression = Off/zlib.output_compression = On/" /etc/php/${PHP_VERSION}/fpm/php.ini
+RUN sed -ie "s/;clear_env = no/clear_env = no/" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
+RUN sed -ie "s/listen = \/run\/php\/php${PHP_VERSION}-fpm.sock/listen = \/run\/php-fpm.sock/" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
+RUN sed -ie "s/pid = \/run\/php\/php${PHP_VERSION}-fpm.pid/pid = \/run\/php-fpm.pid/" /etc/php/${PHP_VERSION}/fpm/php-fpm.conf
 # Why does this file exist?
 RUN rm /etc/php/${PHP_VERSION}/fpm/pool.d/www.confe
 
