@@ -48,6 +48,7 @@ RUN sed -ie "s/pid = \/run\/php\/php${PHP_VERSION}-fpm.pid/pid = \/run\/php-fpm.
 RUN rm /etc/php/${PHP_VERSION}/fpm/pool.d/www.confe
 
 ## Install Composer
+RUN apt-get install -qy unzip
 RUN php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }"
 RUN php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 RUN composer config -g cache-dir /composer_cache
