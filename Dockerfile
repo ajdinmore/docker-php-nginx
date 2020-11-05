@@ -1,5 +1,7 @@
 FROM debian:buster-slim as base
 
+WORKDIR /app
+
 RUN apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
@@ -15,6 +17,10 @@ RUN apt-get -qy update && apt-get -qy install \
 ## Add PHP repo
  && curl -sSLo /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
  && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+
+## Copy Lighttpd config and fallback index file
+COPY lighttpd.conf /etc/lighttpd/default.conf
+COPY index.php /app/public/index.php
 
 ## Introduce PHP version as late as possible
 ARG PHP_VERSION
@@ -49,12 +55,6 @@ RUN apt-get -qy update && apt-get -qy install \
  && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
  && composer config -g cache-dir /composer_cache \
  && rm /tmp/*
-
-## Copy Lighttpd config and fallback index file
-COPY lighttpd.conf /etc/lighttpd/default.conf
-COPY index.php /app/public/index.php
-
-WORKDIR /app
 
 ## On run, create file descriptors 3 & 4 as aliases for stdout and stderr, allow all to write to it,
 ## then launch the PHP process manager as a daemon and Lighttpd in the foreground
