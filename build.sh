@@ -3,7 +3,7 @@
 export DOCKER_BUILDKIT=1
 
 REPO=ajdinmore/php-dev
-PHP_VERSIONS=(7.2 7.3 7.4)
+PHP_VERSIONS=(7.4 7.3 7.2)
 declare -A TYPES=([base]='' [debug]='-debug')
 
 for PHP_VERSION in ${PHP_VERSIONS[@]}
