@@ -1,12 +1,21 @@
 FROM debian:buster-slim as base
 
-WORKDIR /app
-
+## Install Tini
 ARG TINI_VERSION=v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-ENTRYPOINT ["/tini", "--"]
 
-RUN chmod +x /tini \
+## Set working directory to project root
+WORKDIR /app
+
+## Copy Lighttpd config, fallback index & start script
+COPY lighttpd.conf /etc/lighttpd/default.conf
+COPY index.php /app/public/index.php
+COPY start.sh /start.sh
+
+## Set execution flags
+RUN chmod +x /start.sh /tini \
+
+# Install things that'll be the same for all builds
  && apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
@@ -23,10 +32,6 @@ RUN chmod +x /tini \
 ## Add PHP repo
  && curl -sSLo /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
  && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
-
-## Copy Lighttpd config and fallback index file
-COPY lighttpd.conf /etc/lighttpd/default.conf
-COPY index.php /app/public/index.php
 
 ## Introduce PHP version as late as possible
 ARG PHP_VERSION
@@ -62,11 +67,9 @@ RUN apt-get -qy update && apt-get -qy install \
  && composer config -g cache-dir /composer_cache \
  && rm /tmp/*
 
-## On run, create file descriptors 3 & 4 as aliases for stdout and stderr, allow all to write to it,
-## then launch the PHP process manager as a daemon and Lighttpd in the foreground
-CMD exec 3>&1 4>&2 && chmod a+w /dev/fd/3 /dev/fd/4 \
- && /usr/sbin/php-fpm${PHP_VERSION} -D --fpm-config /etc/php/${PHP_VERSION}/fpm/php-fpm.conf \
- && lighttpd -D -f /etc/lighttpd/default.conf
+## Configure startup
+ENTRYPOINT ["/tini", "--"]
+CMD [ "/start.sh" ]
 
 ###########
 ## DEBUG ##
@@ -81,4 +84,4 @@ RUN apt-get -qy update && apt-get -qy install \
  && pecl channel-update pecl.php.net && pecl install xdebug \
  && echo 'zend_extension=/usr/lib/php/20180731/xdebug.so' > /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
  && echo 'xdebug.remote_enable=1' >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
- && phpenmod xdebug \
+ && phpenmod xdebug
