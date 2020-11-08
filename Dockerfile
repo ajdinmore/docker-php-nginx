@@ -2,13 +2,19 @@ FROM debian:buster-slim as base
 
 WORKDIR /app
 
-RUN apt-get -qy update && apt-get -qy install \
+ARG TINI_VERSION=v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ENTRYPOINT ["/tini", "--"]
+
+RUN chmod +x /tini \
+ && apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
     ca-certificates \
     curl \
     unzip \
     lighttpd \
+    nano \
     && rm -rf /var/lib/apt/lists/* \
 
 ## Disable Lighttpd unconfigured mod

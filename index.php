@@ -13,13 +13,13 @@
     <div class="jumbotron shadow-sm mt-5">
         <h1 class="display-4">Server Active</h1>
         <p class="lead">
-            <span class="mr-4">
+            <span class="mr-4 text-nowrap">
                 php version <code><?= phpversion() ?></code>
             </span>
-            <span class="mr-4">
+            <span class="mr-4 text-nowrap">
                 web user <code><?= getenv('USER') ?></code>
             </span>
-            <span class="mr-4">
+            <span class="mr-4 text-nowrap">
                 web root <code><?= getenv('DOCUMENT_ROOT') ?></code>
             </span>
         </p>
