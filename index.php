@@ -1,4 +1,8 @@
-<?php if (isset($_GET['info'])) {
+<?php
+header('Content-type: text/plain');
+var_dump($_SERVER);
+exit;
+if ('/info' === $_SERVER['PATH_INFO']) {
     phpinfo();
     return;
 } ?>
@@ -24,7 +28,7 @@
             </span>
         </p>
         <hr>
-        <a href="?info" class="btn btn-primary text-monospace">phpinfo()</a>
+        <a href="/info" class="btn btn-primary text-monospace">phpinfo()</a>
     </div>
 </div>
 </body>

@@ -1,40 +1,34 @@
+ARG BASE
+
 FROM debian:buster-slim as base
+ARG TINI_VERSION=v0.19.0
+ARG PHP_VERSION
+
+## Set working directory & startup command
+WORKDIR /app
+CMD [ "/start.sh" ]
 
 ## Install Tini
-ARG TINI_VERSION=v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ENTRYPOINT ["/tini", "--"]
+RUN chmod +x /tini \
 
-## Set working directory to project root
-WORKDIR /app
-
-## Copy Lighttpd config, fallback index & start script
-COPY lighttpd.conf /etc/lighttpd/default.conf
-COPY index.php /app/public/index.php
-COPY start.sh /start.sh
-
-## Set execution flags
-RUN chmod +x /start.sh /tini \
-
-# Install things that'll be the same for all builds
+## Install things that'll be the same for all builds
  && apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
     ca-certificates \
     curl \
     unzip \
-    lighttpd \
     nano \
+    less \
     && rm -rf /var/lib/apt/lists/* \
-
-## Disable Lighttpd unconfigured mod
- && lighty-disable-mod unconfigured \
 
 ## Add PHP repo
  && curl -sSLo /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
  && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 
 ## Introduce PHP version as late as possible
-ARG PHP_VERSION
 ENV PHP_VERSION=${PHP_VERSION} \
     COMPOSER_ALLOW_SUPERUSER=1
 
@@ -67,13 +61,13 @@ RUN apt-get -qy update && apt-get -qy install \
  && composer config -g cache-dir /composer_cache \
  && rm /tmp/*
 
-## Configure startup
-ENTRYPOINT ["/tini", "--"]
-CMD [ "/start.sh" ]
+## Fallback index file
+COPY index.php /app/public/index.php
 
-###########
-## DEBUG ##
-###########
+
+############
+## XDEBUG ##
+############
 FROM base as debug
 ARG PHP_VERSION
 
@@ -85,3 +79,40 @@ RUN apt-get -qy update && apt-get -qy install \
  && echo 'zend_extension=/usr/lib/php/20180731/xdebug.so' > /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
  && echo 'xdebug.remote_enable=1' >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
  && phpenmod xdebug
+
+
+##############
+## LIGHTTPD ##
+##############
+FROM $BASE as lighttpd
+
+## Copy Lighttpd config & start script
+COPY lighttpd.conf /etc/lighttpd/default.conf
+COPY start-lighttpd.sh /start.sh
+
+## Install server
+RUN apt-get -qy update && apt-get -qy install \
+    lighttpd \
+    && rm -rf /var/lib/apt/lists/* \
+
+## Disable Lighttpd unconfigured mod
+ && lighty-disable-mod unconfigured \
+
+## Set execution flag
+ && chmod +x /start.sh
+
+
+###########
+## NGINX ##
+###########
+FROM $BASE as nginx
+
+COPY start-nginx.sh /start.sh
+
+RUN apt-get -qy update && apt-get -qy install \
+    nginx \
+    && rm -rf /var/lib/apt/lists/* \
+
+ && chmod +x /start.sh
+
+COPY nginx.conf /etc/nginx/sites-available/default
