@@ -1,7 +1,4 @@
 <?php
-header('Content-type: text/plain');
-var_dump($_SERVER);
-exit;
 if ('/info' === $_SERVER['PATH_INFO']) {
     phpinfo();
     return;
@@ -14,21 +11,27 @@ if ('/info' === $_SERVER['PATH_INFO']) {
 </head>
 <body>
 <div class="container">
-    <div class="jumbotron shadow-sm mt-5">
+    <div class="jumbotron shadow-sm mt-5 text-muted">
         <h1 class="display-4">Server Active</h1>
         <p class="lead">
             <span class="mr-4 text-nowrap">
-                php version <code><?= phpversion() ?></code>
+                php <code><?= phpversion() ?></code>
             </span>
             <span class="mr-4 text-nowrap">
-                web user <code><?= getenv('USER') ?></code>
+                root <code><?= getenv('DOCUMENT_ROOT') ?></code>
             </span>
             <span class="mr-4 text-nowrap">
-                web root <code><?= getenv('DOCUMENT_ROOT') ?></code>
+                user <code><?= getenv('USER') ?></code>
+            </span>
+            <span class="mr-4 text-nowrap">
+                server <code><?= $_SERVER['SERVER_SOFTWARE'] ?></code>
+            </span>
+            <span class="mr-4 text-nowrap">
+                xdebug <code><?= extension_loaded('xdebug') ? 'yes' : 'no' ?></code>
             </span>
         </p>
         <hr>
-        <a href="/info" class="btn btn-primary text-monospace">phpinfo()</a>
+        <a href="/info" class="btn btn-outline-info text-monospace">phpinfo()</a>
     </div>
 </div>
 </body>

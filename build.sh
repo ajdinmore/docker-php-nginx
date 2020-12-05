@@ -2,24 +2,34 @@
 
 export DOCKER_BUILDKIT=1
 
-REPO=ajdinmore/lighttpd-php-dev
 PHP_VERSIONS=(7.4 7.3 7.2)
+SERVERS=(nginx lighttpd)
 declare -A TYPES=([base]='' [debug]='-debug')
 
-for PHP_VERSION in ${PHP_VERSIONS[@]}
-do
-  for TARGET in ${!TYPES[@]}
-  do
-    printf "\n\n${PHP_VERSION}${TYPES[$TARGET]}\n\n"
-    docker build \
-      --target ${TARGET} \
-      --build-arg PHP_VERSION=${PHP_VERSION} \
-      --tag ${REPO}:${PHP_VERSION}${TYPES[$TARGET]} \
-      . \
-      || exit 1
-      docker push ${REPO}:${PHP_VERSION}${TYPES[$TARGET]}
-  done
-done
+for TARGET in "${SERVERS[@]}"; do
+  NAME="ajdinmore/${TARGET}-php-dev"
 
-docker tag ${REPO}:7.4 ${REPO}:latest
-docker push ${REPO}:latest
+  for PHP_VERSION in "${PHP_VERSIONS[@]}"; do
+    for BASE in "${!TYPES[@]}"; do
+
+      TAG="${PHP_VERSION}${TYPES[$TARGET]}"
+      REPO="${NAME}:${TAG}"
+
+      printf "\n\n%s\n\n" "${REPO}"
+
+      docker build \
+        --target "${TARGET}" \
+        --build-arg "BASE=${BASE}" \
+        --build-arg "PHP_VERSION=${PHP_VERSION}" \
+        --tag "${REPO}" \
+        . ||
+        exit 1
+
+      docker push "${REPO}"
+
+    done
+  done
+
+  docker tag "${NAME}:7.4" "${NAME}:latest"
+  docker push "${NAME}:latest"
+done

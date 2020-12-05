@@ -1,4 +1,4 @@
-ARG BASE
+ARG BASE=base
 
 FROM debian:buster-slim as base
 ARG TINI_VERSION=v0.19.0
@@ -6,15 +6,15 @@ ARG PHP_VERSION
 
 ## Set working directory & startup command
 WORKDIR /app
-CMD [ "/start.sh" ]
+CMD [ "../start.sh" ]
 
 ## Install Tini
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-ENTRYPOINT ["/tini", "--"]
-RUN chmod +x /tini \
+#ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+#ENTRYPOINT ["/tini", "--"]
+#RUN chmod +x /tini \
 
 ## Install things that'll be the same for all builds
- && apt-get -qy update && apt-get -qy install \
+RUN apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
     ca-certificates \
@@ -42,6 +42,9 @@ RUN apt-get -qy update && apt-get -qy install \
     php${PHP_VERSION}-xml \
     php${PHP_VERSION}-mbstring \
     php${PHP_VERSION}-intl \
+    php${PHP_VERSION}-opcache \
+    php${PHP_VERSION}-mysql \
+    php${PHP_VERSION}-imagick \
     && rm -rf /var/lib/apt/lists/* \
 
 ## Update PHP config
@@ -76,7 +79,7 @@ RUN apt-get -qy update && apt-get -qy install \
     php${PHP_VERSION}-dev \
     && rm -rf /var/lib/apt/lists/* \
  && pecl channel-update pecl.php.net && pecl install xdebug \
- && echo 'zend_extension=/usr/lib/php/20180731/xdebug.so' > /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
+ && echo "zend_extension=$(find /usr/lib/php/ -name xdebug.so)" > /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
  && echo 'xdebug.remote_enable=1' >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
  && phpenmod xdebug
 
