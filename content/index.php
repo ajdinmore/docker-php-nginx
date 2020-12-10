@@ -1,5 +1,5 @@
 <?php
-if ('/info' === $_SERVER['PATH_INFO']) {
+if ('/info' === $_SERVER['REQUEST_URI']) {
     phpinfo();
     return;
 } ?>
@@ -31,7 +31,7 @@ if ('/info' === $_SERVER['PATH_INFO']) {
             </span>
         </p>
         <hr>
-        <a href="/info" class="btn btn-outline-info text-monospace">phpinfo()</a>
+        <a href="/info" class="btn btn-outline-info text-monospace pl-4 pr-4">phpinfo()</a>
     </div>
 </div>
 </body>
