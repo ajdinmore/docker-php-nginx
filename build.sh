@@ -5,12 +5,12 @@ export DOCKER_BUILDKIT=1
 REPO="${1-ajdinmore/php-dev}"
 PHP_VERSIONS=('8.0' '7.4' '7.3' '7.2')
 SERVERS=('nginx' 'lighttpd')
-declare -A TYPES=(['php']='' ['debug']='-debug')
+declare -A TARGETS=(['php']='' ['debug']='-debug')
 
 for PHP_VERSION in "${PHP_VERSIONS[@]}"; do
-  for TARGET in "${!TYPES[@]}"; do
+  for TARGET in "${!TARGETS[@]}"; do
 
-    VERSION="${PHP_VERSION}${TYPES[$TARGET]}"
+    VERSION="${PHP_VERSION}${TARGETS[$TARGET]}"
 
     for SERVER in "${SERVERS[@]}"; do
 

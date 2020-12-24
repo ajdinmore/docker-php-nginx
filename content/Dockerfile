@@ -17,6 +17,8 @@ RUN apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
     ca-certificates \
+    iputils-ping \
+    dnsutils \
     curl \
     unzip \
     nano \
@@ -91,6 +93,7 @@ RUN apt-get -qy update && apt-get -qy install \
     php${PHP_VERSION}-intl \
     php${PHP_VERSION}-mysql \
     php${PHP_VERSION}-imagick \
+    php${PHP_VERSION}-redis \
     && rm -rf /var/lib/apt/lists/* \
 
 ## Update PHP config
