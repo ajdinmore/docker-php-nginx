@@ -27,15 +27,15 @@ for PHP_VERSION in "${PHP_VERSIONS[@]}"; do
         content ||
         exit 1
 
-      docker push "${IMAGE}"
+      docker push "${IMAGE}" || exit 2
 
     done
 
-    docker tag "${REPO}:nginx-${VERSION}" "${REPO}:${VERSION}"
-    docker push "${REPO}:${VERSION}"
+    docker tag "${REPO}:${VERSION}-nginx" "${REPO}:${VERSION}" || exit 2
+    docker push "${REPO}:${VERSION}" || exit 2
 
   done
 done
 
-docker tag "${REPO}:7.4" "${REPO}:latest"
-docker push "${REPO}:latest"
+docker tag "${REPO}:7.4" "${REPO}:latest" || exit 2
+docker push "${REPO}:latest" || exit 2
