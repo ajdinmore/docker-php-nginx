@@ -10,6 +10,7 @@ TAG="${SERVER}-${PHP_VERSION}-${TARGET}"
 IMAGE="${REPO}:${TAG}"
 
 docker build \
+  --file Dockerfile \
   --target "${TARGET}" \
   --build-arg "SERVER=${SERVER}" \
   --build-arg "PHP_VERSION=${PHP_VERSION}" \

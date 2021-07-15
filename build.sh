@@ -20,6 +20,7 @@ for PHP_VERSION in "${PHP_VERSIONS[@]}"; do
       printf "\n\n%s\n\n" "${TAG}"
 
       docker build \
+        --file Dockerfile \
         --target "${TARGET}" \
         --build-arg "SERVER=${SERVER}" \
         --build-arg "PHP_VERSION=${PHP_VERSION}" \

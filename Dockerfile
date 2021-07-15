@@ -92,8 +92,10 @@ RUN apt-get -qy update && apt-get -qy install \
     php${PHP_VERSION}-mbstring \
     php${PHP_VERSION}-intl \
     php${PHP_VERSION}-mysql \
-    php${PHP_VERSION}-imagick \
+    php${PHP_VERSION}-pgsql \
     php${PHP_VERSION}-redis \
+    php${PHP_VERSION}-imagick \
+    php${PHP_VERSION}-gd \
     && rm -rf /var/lib/apt/lists/* \
 
 ## Update PHP config
