@@ -23,6 +23,8 @@ RUN apt-get -qy update && apt-get -qy install \
     unzip \
     nano \
     less \
+    git \
+    man \
     && rm -rf /var/lib/apt/lists/* \
 
 ## ll shortcut
@@ -104,8 +106,9 @@ RUN apt-get -qy update && apt-get -qy install \
  && sed -ie "s/;clear_env = no/clear_env = no/" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf \
  && sed -ie "s/listen = \/run\/php\/php${PHP_VERSION}-fpm.sock/listen = \/run\/php-fpm.sock/" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf \
  && sed -ie "s/pid = \/run\/php\/php${PHP_VERSION}-fpm.pid/pid = \/run\/php-fpm.pid/" /etc/php/${PHP_VERSION}/fpm/php-fpm.conf \
+
 # Why does this file exist?
-#RUN rm /etc/php/${PHP_VERSION}/fpm/pool.d/www.confe
+ && rm /etc/php/${PHP_VERSION}/fpm/pool.d/www.confe \
 
 ## Install Composer
  && curl -sSLo /tmp/composer-setup.php https://getcomposer.org/installer \
