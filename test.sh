@@ -2,7 +2,7 @@
 
 export DOCKER_BUILDKIT=1
 
-PHP_VERSION=${PHP_VERSION:-7.4}
+PHP_VERSION=${PHP_VERSION:-8.0}
 TARGET=${TARGET:-php}
 SERVER=${SERVER:-nginx}
 REPO="ajdinmore/php-dev-test"

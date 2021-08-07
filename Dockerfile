@@ -1,6 +1,7 @@
 ARG SERVER=nginx
+ARG PHP_VERSION=8.0
 
-FROM debian:buster-slim as system
+FROM debian:stable-slim as system
 #ARG TINI_VERSION=v0.19.0
 
 ## Set working directory & startup command
@@ -43,14 +44,13 @@ COPY index.php /app/public/index.php
 ###########
 FROM system as nginx
 
-COPY start-nginx.sh /start.sh
-
+## Install server
 RUN apt-get -qy update && apt-get -qy install \
     nginx \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/*
 
- && chmod +x /start.sh
-
+## Copy NGINX site config & start script
+COPY start-nginx.sh /start.sh
 COPY nginx.conf /etc/nginx/sites-available/default
 
 
@@ -69,10 +69,7 @@ RUN apt-get -qy update && apt-get -qy install \
     && rm -rf /var/lib/apt/lists/* \
 
 ## Disable Lighttpd unconfigured mod
- && lighty-disable-mod unconfigured \
-
-## Set execution flag
- && chmod +x /start.sh
+ && lighty-disable-mod unconfigured
 
 
 #########
@@ -82,7 +79,9 @@ FROM $SERVER as php
 
 ARG PHP_VERSION
 ENV PHP_VERSION=${PHP_VERSION} \
-    COMPOSER_ALLOW_SUPERUSER=1
+    COMPOSER_HOME=/composer \
+    EDITOR=nano \
+    PAGER=less
 
 ## Install PHP
 RUN apt-get -qy update && apt-get -qy install \
@@ -115,7 +114,6 @@ RUN apt-get -qy update && apt-get -qy install \
  && curl -sSLo /tmp/composer-setup.sig https://composer.github.io/installer.sig \
  && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
  && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
- && composer config -g cache-dir /composer_cache \
  && rm /tmp/*
 
 
