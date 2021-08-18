@@ -1,7 +1,9 @@
 ARG SERVER=nginx
 ARG PHP_VERSION=8.0
 
-FROM debian:stable-slim as system
+## some bullseye repos not ready yet - 2021-08-18
+FROM debian:buster-slim as system
+
 #ARG TINI_VERSION=v0.19.0
 
 ## Set working directory & startup command
@@ -47,7 +49,12 @@ FROM system as nginx
 ## Install server
 RUN apt-get -qy update && apt-get -qy install \
     nginx \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+
+## Set server user & group to 1000 to match Ubuntu-based workstations so we save messing with permissions so much
+ && usermod -u 1000 www-data && groupmod -g 1000 www-data
+
+
 
 ## Copy NGINX site config & start script
 COPY start-nginx.sh /start.sh
