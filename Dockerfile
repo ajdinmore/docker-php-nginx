@@ -20,6 +20,8 @@ RUN apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
     ca-certificates \
+    postgresql-client \
+    default-mysql-client \
     iputils-ping \
     dnsutils \
     curl \
@@ -88,7 +90,7 @@ ARG PHP_VERSION
 ENV PHP_VERSION=${PHP_VERSION} \
     COMPOSER_HOME=/composer \
     EDITOR=nano \
-    PAGER=less
+    PAGER='less -R'
 
 ## Install PHP
 RUN apt-get -qy update && apt-get -qy install \
@@ -112,9 +114,14 @@ RUN apt-get -qy update && apt-get -qy install \
  && sed -ie "s/;clear_env = no/clear_env = no/" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf \
  && sed -ie "s/listen = \/run\/php\/php${PHP_VERSION}-fpm.sock/listen = \/run\/php-fpm.sock/" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf \
  && sed -ie "s/pid = \/run\/php\/php${PHP_VERSION}-fpm.pid/pid = \/run\/php-fpm.pid/" /etc/php/${PHP_VERSION}/fpm/php-fpm.conf \
+ && sed -ie "s/;date.timezone =/date.timezone = UTC/" /etc/php/${PHP_VERSION}/fpm/php.ini \
+ && sed -ie "s/;date.timezone =/date.timezone = UTC/" /etc/php/${PHP_VERSION}/cli/php.ini \
 
 # Why does this file exist?
- && rm /etc/php/${PHP_VERSION}/fpm/pool.d/www.confe \
+# && rm /etc/php/${PHP_VERSION}/fpm/pool.d/www.confe \
+
+# Create directory for COMPOSER_HOME (full access so works with any user)
+ && mkdir -m 777 $COMPOSER_HOME \
 
 ## Install Composer
  && curl -sSLo /tmp/composer-setup.php https://getcomposer.org/installer \

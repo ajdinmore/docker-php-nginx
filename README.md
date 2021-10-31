@@ -6,6 +6,7 @@
 - Server user and group IDs configurable on build (default 1000:1000)
 - Easily mountable project and Composer paths
 - Optional Xdebug
+- Timezone set to UTC (don't know if this is a good thing to do or not, but some things complain when it's not set)
 
 ## Paths
 
@@ -23,24 +24,26 @@ Path | Purpose
 services:
   web:
     image: ajdinmore/php-dev:8.0-debug
+    user: ${USER:-1000:1000}
     volumes:
     - ./:/app
-    - ${COMPOSER_HOME:-${HOME}/.composer}:/composer
+    - ${COMPOSER_HOME:-~/.composer}:/composer
     ports:
     - ${HTTP_PORT:-80}:80
 ```
+Access shell for composer/console using `docker-compose exec -u $UID:$GID web bash`
 
 ## Command Examples
 
 ```shell
-# Install dependencies
-docker run --rm -tv $(pwd):/app -u www-data ajdinmore/php-dev composer install
-
-# Install dependencies (protect against accidental edits)
-docker run --rm -tv $(pwd):/app ajdinmore/php-dev composer install
-
 # Run web server on port 8080 (interactive for clean exit)
 docker run --rm -itv $(pwd):/app -p 8080:80 ajdinmore/php-dev
+
+# Install dependencies (as root, maybe protect against accidental edits)
+docker run --rm -itv $(pwd):/app ajdinmore/php-dev composer install
+
+# Install dependencies as if run on host system
+docker run --rm -itu $(id -u):$(id -g) -v $(pwd):/app -v ~/.composer:/composer ajdinmore/php-dev composer install
 ```
 
 ## Available Tags
@@ -61,7 +64,7 @@ Default server is NGINX
 
 ### Servers
 
-`nginx` `lighttpd`
+`nginx` ~~lighttpd~~
 
 ## Build
 
