@@ -1,88 +1,69 @@
-# Docker images for local PHP dev work
-> Use anywhere else at your own risk
+# Andy's PHP & NGINX Docker Images
 
-- Official PHP repository for up-to-date builds
-- Includes Composer, Git and other common tools (curl, ping, less, etc.)
-- Server user and group IDs configurable on build (default 1000:1000)
-- Easily mountable project and Composer paths
-- Optional Xdebug
-- Timezone set to UTC (don't know if this is a good thing to do or not, but some things complain when it's not set)
+## `ajdinmore/nginx`
+🔗 [Docker Hub](https://hub.docker.com/r/ajdinmore/nginx)
+
+Tweaked version of [standard Docker NGINX Image](https://hub.docker.com/_/nginx) for PHP applications.
+
+Currently, no SSL support; handle it in your load balancer.
 
 ## Paths
 
-Path | Purpose
---- | ---
-`/app` | Project root
-`/app/public` | Web root
-`/composer` | Composer "home" directory
-`/composer/cache` | Composer cache
-`/composer/auth.json` | Composer OAuth tokens
+| Path                  | Purpose                   |
+|-----------------------|---------------------------|
+| `/app`                | Project root              |
+| `/app/public`         | Web root                  |
 
-## Compose File Example
+### Runtime Environment Variables
 
-```yaml
-services:
-  web:
-    image: ajdinmore/php-dev:8.0-debug
-    user: ${USER:-1000:1000}
-    volumes:
-    - ./:/app
-    - ${COMPOSER_HOME:-~/.composer}:/composer
-    ports:
-    - ${HTTP_PORT:-80}:80
-```
-Access shell for composer/console using `docker-compose exec -u $UID:$GID web bash`
+| Variable     | Purpose                      | Default         |
+|--------------|------------------------------|-----------------|
+| `NGINX_PORT` | Port NGINX will listen on    | `80`            |
+| `NGINX_HOST` | Web server host              | `_` (all hosts) |
+| `NGINX_ROOT` | Web server root path         | `/app/public`   |
+| `PHP_HOST`   | Network host name of PHP-FPM | `php`           |
+| `PHP_PORT`   | Port to access PHP-FPM       | `9000`          |
 
-## Command Examples
+---
 
-```shell
-# Run web server on port 8080 (interactive for clean exit)
-docker run --rm -itv $(pwd):/app -p 8080:80 ajdinmore/php-dev
+## `ajdinmore/php`
+🔗 [Docker Hub](https://hub.docker.com/r/ajdinmore/php)
 
-# Install dependencies (as root, maybe protect against accidental edits)
-docker run --rm -itv $(pwd):/app ajdinmore/php-dev composer install
+PHP-FPM and some standard extensions, installed from official PHP Debian repository.
 
-# Install dependencies as if run on host system
-docker run --rm -itu $(id -u):$(id -g) -v $(pwd):/app -v ~/.composer:/composer ajdinmore/php-dev composer install
-```
+Includes globally accessible Composer "binary".
 
-## Available Tags
+Listens on port `9000`.
 
-`${PHP_VERSION}`
+Worker user will match the user the container runs under. Default user `www-data`, ID `1000`.
 
-`${PHP_VERSION}-${SERVER}`
+## Tag Structure
 
-`${PHP_VERSION}-debug`
+`${PHP_VERSION}-${BUILD_TARGET}`
 
-`${PHP_VERSION}-debug-${SERVER}`
+E.g. `8.1-dev`
 
-Default server is NGINX
+### Available PHP Versions
+- `8.1`
+- `8.0`
+- `7.4`
+- `7.3`
 
-### PHP Versions
+### Available Build Targets
+- `fpm` - standard/production
+- `dev` - dev config & tools
+- `debug` - as dev, with Xdebug (untested)
 
-`8.0` `7.4` `7.3` `7.2`
+## Available Build Args
 
-### Servers
-
-`nginx` ~~lighttpd~~
-
-## Build
-
-### Targets
-
-Target | Content
----|---
-`system` | Base system: latest stable Debian with utilities & PHP repo
-`nginx` | Base system with NGINX
-`lighttpd` | Base system with Lighttpd
-`php` | Base system with server and PHP
-`debug` | Base system with server, PHP, and Xdebug
-
-### Arguments
-
-Argument | Default
----|---
-`PHP_VERSION` | `8.0`
-`SERVER` | `nginx`
-`WWW_USER_ID` | `1000`
-`WWW_GROUP_ID` | `1000`
+| Arg              | Purpose                                                                          | Default                                                                                           |
+|------------------|----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `PHP_VERSION`    | Version of PHP-FPM to install                                                    | `8.1`                                                                                             |
+| `DEBIAN_RELEASE` | Debian release to base the image on                                              | `bullseye`                                                                                        |
+| `WWW_USER_ID`    | ID of the default `www-data` user                                                | `1000`                                                                                            |
+| `WWW_GROUP_ID`   | ID of the default user's `www-data` group                                        | `1000`                                                                                            |
+| `PHP_EXTENSIONS` | PHP extensions to install                                                        | `php-curl php-zip php-xml php-mbstring php-intl php-mysql php-pgsql php-redis php-imagick php-gd` |
+| `DEV_TOOLS`      | Utilities to install in the `dev` image                                          | `postgresql-client default-mysql-client iputils-ping dnsutils unzip nano less git man`            |
+| `COMPOSER_HOME`  | Path of the Composer "home" directory (location of cache & OAuth tokens)         | `/composer`                                                                                       |
+| `SHELL_EDITOR`   | Default editor to use in Bash on the `dev` image (environment variable `EDITOR`) | `nano`                                                                                            |
+| `SHELL_PAGER`    | Pager to use in Bash on the `dev` image (environment variable `PAGER`)           | `less -R`                                                                                         |
