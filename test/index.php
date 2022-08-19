@@ -21,7 +21,7 @@ if ('/info' === $_SERVER['REQUEST_URI']) {
 </head>
 <body>
 <div class="container">
-    <div class="card mt-5 text-muted border bg-light">
+    <div class="card mt-5 text-muted border bg-light shadow-sm">
         <div class="card-body">
         <h1 class="card-title">Server Active</h1>
         <p class="card-text lead">

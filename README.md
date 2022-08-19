@@ -9,10 +9,10 @@ Currently, no SSL support; handle it in your load balancer.
 
 ## Paths
 
-| Path                  | Purpose                   |
-|-----------------------|---------------------------|
-| `/app`                | Project root              |
-| `/app/public`         | Web root                  |
+| Path             | Purpose                                               |
+|------------------|-------------------------------------------------------|
+| `/app`           | Project root                                          |
+| `/app/public`    | Web root                                              |
 
 ### Runtime Environment Variables
 
@@ -37,24 +37,32 @@ Listens on port `9000`.
 
 Worker user will match the user the container runs under. Default user `www-data`, ID `1000`.
 
+## Paths
+
+| Path             | Purpose                                                                                    |
+|------------------|--------------------------------------------------------------------------------------------|
+| `/composer`      | Composer home directory - mount to `${COMPOSER_HOME:-~/.composer}` for cache/OAuth support |
+| `/home/www-data` | Home directory for default `www-data` user                                                 |
+| `/tmp/home`      | Home directory for non-existent user (dev/debug only)                                      |
+
 ## Tag Structure
 
 `${PHP_VERSION}-${BUILD_TARGET}`
 
 E.g. `8.1-dev`
 
-### Available PHP Versions
+### PHP Versions
 - `8.1`
 - `8.0`
 - `7.4`
 - `7.3`
 
-### Available Build Targets
+### Build Targets
 - `fpm` - standard/production
 - `dev` - dev config & tools
 - `debug` - as dev, with Xdebug (untested)
 
-## Available Build Args
+## Build Args
 
 | Arg              | Purpose                                                                          | Default                                                                                           |
 |------------------|----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|

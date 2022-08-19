@@ -5,6 +5,7 @@ FROM debian:${DEBIAN_RELEASE}-slim as fpm
 
 ARG WWW_USER_ID=1000
 ARG WWW_GROUP_ID=1000
+ARG WWW_HOME_DIR=/home/www-data
 
 ARG PHP_VERSION
 ARG PHP_EXTENSIONS='\
@@ -42,7 +43,11 @@ EXPOSE 9000
 STOPSIGNAL SIGQUIT
 
 ## Update default user/group IDs to match Ubuntu defaults
-RUN usermod -u ${WWW_USER_ID} www-data && groupmod -g ${WWW_GROUP_ID} www-data
+RUN usermod --uid ${WWW_USER_ID} www-data \
+    && groupmod --gid ${WWW_GROUP_ID} www-data \
+    && mkdir --parents ${WWW_HOME_DIR} \
+    && chown www-data:www-data ${WWW_HOME_DIR} \
+    && usermod --home ${WWW_HOME_DIR} www-data
 
 ## Install build dependencies
 RUN apt-get -qy update && apt-get -qy install \
@@ -94,7 +99,8 @@ ARG SHELL_EDITOR=nano
 ARG SHELL_PAGER='less -R'
 
 ENV EDITOR=${SHELL_EDITOR} \
-    PAGER=${SHELL_PAGER}
+    PAGER=${SHELL_PAGER} \
+    IS_DEV_IMAGE=1
 
 USER root
 
