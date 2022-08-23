@@ -59,6 +59,7 @@ E.g. `8.1-dev`
 
 ### Build Targets
 - `fpm` - standard/production
+- `build` - includes [Composer](https://getcomposer.org/) and `unzip`
 - `dev` - dev config & tools
 - `debug` - as dev, with Xdebug (untested)
 

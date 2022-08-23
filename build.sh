@@ -15,7 +15,7 @@ docker push "${REPO}" || exit 2
 REPO="${1-ajdinmore}/php"
 DEBIAN_RELEASE='bullseye'
 PHP_VERSIONS=('7.3' '7.4' '8.0' '8.1')
-TARGETS=('debug' 'dev' 'fpm')
+TARGETS=('debug' 'dev' 'build' 'fpm')
 
 docker pull "debian:${DEBIAN_RELEASE}-slim"
 

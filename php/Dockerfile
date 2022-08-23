@@ -32,8 +32,7 @@ ARG DEV_TOOLS='\
     man \
 '
 
-ENV PHP_VERSION=${PHP_VERSION} \
-    COMPOSER_HOME=/composer
+ENV PHP_VERSION=${PHP_VERSION}
 
 ## Container config
 ENTRYPOINT ["docker-entry"]
@@ -67,7 +66,6 @@ RUN apt-get -qy update && apt-get -qy install \
  && rm -r /etc/php/${PHP_VERSION}/fpm/pool.d/ \
 \
 ## Clean up
- && apt-get -qy autoremove \
  && apt-get -qy clean all \
  && rm -rf /var/lib/apt/lists/*
 
@@ -77,7 +75,25 @@ COPY php-fpm.conf /etc/php/${PHP_VERSION}/fpm/
 COPY cli.ini /etc/php/${PHP_VERSION}/cli/conf.d/
 COPY fpm.ini /etc/php/${PHP_VERSION}/fpm/conf.d/
 
-# Create directory for COMPOSER_HOME (full access so works with any user)
+## Set default user
+USER www-data
+
+###########
+## BUILD ##
+###########
+FROM fpm as build
+
+ARG COMPOSER_HOME=/composer
+ENV COMPOSER_HOME=${COMPOSER_HOME}
+
+USER root
+
+## Add unzip so we don't have to use PHP zip extension
+RUN apt-get update -qy && apt-get install -qy unzip \
+ && apt-get -qy clean all \
+ && rm -rf /var/lib/apt/lists/*
+
+## Create directory for COMPOSER_HOME (full access so works with any user)
 RUN mkdir -m 777 $COMPOSER_HOME \
 \
 ## Install Composer
@@ -87,13 +103,12 @@ RUN mkdir -m 777 $COMPOSER_HOME \
  && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
  && rm /tmp/*
 
-## Set default user
 USER www-data
 
 #########
 ## DEV ##
 #########
-FROM fpm as dev
+FROM build as dev
 
 ARG SHELL_EDITOR=nano
 ARG SHELL_PAGER='less -R'
@@ -105,7 +120,6 @@ ENV EDITOR=${SHELL_EDITOR} \
 USER root
 
 RUN apt-get update -qy && apt-get install -qy ${DEV_TOOLS} \
- && apt-get -qy autoremove \
  && apt-get -qy clean all \
  && rm -rf /var/lib/apt/lists/*
 
@@ -130,7 +144,6 @@ RUN apt-get -qy update && apt-get -qy install php-pear php${PHP_VERSION}-dev \
  && echo 'xdebug.mode=debug' >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
  && phpenmod xdebug \
 \
- && apt-get -qy autoremove \
  && apt-get -qy clean all \
  && rm -rf /var/lib/apt/lists/* \
 
