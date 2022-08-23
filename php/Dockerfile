@@ -6,8 +6,10 @@ FROM debian:${DEBIAN_RELEASE}-slim as fpm
 ARG WWW_USER_ID=1000
 ARG WWW_GROUP_ID=1000
 ARG WWW_HOME_DIR=/home/www-data
+ARG COMPOSER_HOME=/composer
 
 ARG PHP_VERSION
+
 ARG PHP_EXTENSIONS='\
     php-curl \
     php-zip \
@@ -33,7 +35,7 @@ ARG DEV_TOOLS='\
 '
 
 ENV PHP_VERSION=${PHP_VERSION} \
-    COMPOSER_HOME=/composer
+    COMPOSER_HOME=${COMPOSER_HOME}
 
 ## Container config
 ENTRYPOINT ["docker-entry"]
@@ -49,12 +51,13 @@ RUN usermod --uid ${WWW_USER_ID} www-data \
     && chown www-data:www-data ${WWW_HOME_DIR} \
     && usermod --home ${WWW_HOME_DIR} www-data
 
-## Install build dependencies
+## Install base dependencies (unzip for Composer, others for adding/using PHP repo)
 RUN apt-get -qy update && apt-get -qy install \
     apt-transport-https \
     lsb-release \
     ca-certificates \
     curl \
+    unzip \
 \
 ## Add PHP repo
  && curl -sSLo /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \

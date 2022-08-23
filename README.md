@@ -9,10 +9,10 @@ Currently, no SSL support; handle it in your load balancer.
 
 ## Paths
 
-| Path             | Purpose                                               |
-|------------------|-------------------------------------------------------|
-| `/app`           | Project root                                          |
-| `/app/public`    | Web root                                              |
+| Path          | Purpose      |
+|---------------|--------------|
+| `/app`        | Project root |
+| `/app/public` | Web root     |
 
 ### Runtime Environment Variables
 
