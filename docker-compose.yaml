@@ -9,11 +9,11 @@ services:
             context: ./nginx
 
     php:
-        image: ajdinmore/php:${PHP_VERSION:-8.1}-${TARGET:-fpm}
+        image: ajdinmore/php:${PHP_VERSION:-8.2}-${TARGET:-fpm}
         tty:   true
         volumes: [ ./test:/app/public ]
         build:
             context: ./php
             target:  ${TARGET:-fpm}
             args:
-                PHP_VERSION: ${PHP_VERSION:-8.1}
+                PHP_VERSION: ${PHP_VERSION:-8.2}

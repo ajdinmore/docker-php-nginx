@@ -4,18 +4,19 @@ export DOCKER_BUILDKIT=1
 
 ## NGINX
 
-REPO="${1-ajdinmore}/nginx"
-docker pull nginx:alpine
-printf "\n\n%s\n\n" "${REPO}"
-docker build --tag "${REPO}" ./nginx/ || exit 1
-docker push "${REPO}" || exit 2
+#REPO="${1-ajdinmore}/nginx"
+#docker pull nginx:alpine
+#printf "\n\n%s\n\n" "${REPO}"
+#docker build --tag "${REPO}" ./nginx/ || exit 1
+#docker push "${REPO}" || exit 2
 
 ## PHP
 
 REPO="${1-ajdinmore}/php"
 DEBIAN_RELEASE='bullseye'
-PHP_VERSIONS=('7.3' '7.4' '8.0' '8.1')
+PHP_VERSIONS=('8.0' '8.1' '8.2')
 TARGETS=('debug' 'dev' 'fpm')
+#TARGETS=('dev' 'fpm')
 
 docker pull "debian:${DEBIAN_RELEASE}-slim"
 
@@ -43,5 +44,5 @@ for PHP_VERSION in "${PHP_VERSIONS[@]}"; do
     docker push "${REPO}:${PHP_VERSION}" || exit 2
 done
 
-docker tag "${REPO}:8.1" "${REPO}:latest" || exit 4
+docker tag "${REPO}:${PHP_VERSIONS[-1]}" "${REPO}:latest" || exit 4
 docker push "${REPO}:latest" || exit 2

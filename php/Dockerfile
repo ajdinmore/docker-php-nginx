@@ -10,18 +10,18 @@ ARG COMPOSER_HOME=/composer
 
 ARG PHP_VERSION
 
-ARG PHP_EXTENSIONS='\
-    php-curl \
-    php-zip \
-    php-xml \
-    php-mbstring \
-    php-intl \
-    php-mysql \
-    php-pgsql \
-    php-redis \
-    php-imagick \
-    php-gd \
-'
+ARG PHP_EXTENSIONS="\
+    php${PHP_VERSION}-curl \
+    php${PHP_VERSION}-zip \
+    php${PHP_VERSION}-xml \
+    php${PHP_VERSION}-mbstring \
+    php${PHP_VERSION}-intl \
+    php${PHP_VERSION}-mysql \
+    php${PHP_VERSION}-pgsql \
+    php${PHP_VERSION}-redis \
+    php${PHP_VERSION}-imagick \
+    php${PHP_VERSION}-gd \
+"
 ARG DEV_TOOLS='\
     postgresql-client \
     default-mysql-client \
