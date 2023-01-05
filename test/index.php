@@ -6,12 +6,14 @@ header('date: '.(new DateTime())->format(DateTimeInterface::RFC7231));
 header('expires: -1');
 header('pragma: no-cache');
 
-//throw new Exception('fwfwa');
 if ('/info' === $_SERVER['REQUEST_URI']) {
     phpinfo();
+    exit;
 
-    return;
-} ?>
+} elseif ('/' !== $_SERVER['REQUEST_URI']) {
+    http_response_code(404);
+}
+?>
 <html lang="en">
 <head>
     <title>Server Active</title>

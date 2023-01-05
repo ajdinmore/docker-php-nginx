@@ -1,8 +1,9 @@
 server {
     listen ${NGINX_PORT} default_server;
 
-    server_name ${NGINX_HOST};
+    server_tokens off;
 
+    server_name ${NGINX_HOST};
     root ${NGINX_ROOT};
     index index.php index.html;
 
@@ -23,5 +24,7 @@ server {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;
+
+        try_files $uri 404;
     }
 }
