@@ -1,7 +1,9 @@
-ARG PHP_VERSION=8.1
-ARG DEBIAN_RELEASE=bullseye
+ARG PHP_VERSION
+#=8.2
+ARG DEBIAN_RELEASE
+#=bullseye
 
-FROM debian:${DEBIAN_RELEASE}-slim as fpm
+FROM debian:${DEBIAN_RELEASE}-slim as base
 
 ARG WWW_USER_ID=1000
 ARG WWW_GROUP_ID=1000
@@ -66,13 +68,15 @@ RUN apt-get -qy update && apt-get -qy install \
 ## Install PHP
  && apt-get -qy update && apt-get -qy install php${PHP_VERSION}-fpm ${PHP_EXTENSIONS} \
 \
-## Remove default config
- && rm -r /etc/php/${PHP_VERSION}/fpm/pool.d/ \
-\
 ## Clean up
  && apt-get -qy autoremove \
  && apt-get -qy clean all \
  && rm -rf /var/lib/apt/lists/*
+
+FROM base as fpm
+
+## Remove default config
+RUN  rm -r /etc/php/${PHP_VERSION}/fpm/pool.d/
 
 ## Add entryopoint & config
 COPY entrypoint.sh /usr/local/bin/docker-entry
@@ -96,7 +100,7 @@ USER www-data
 #########
 ## DEV ##
 #########
-FROM fpm as dev
+FROM fpm as dev-base
 
 ARG SHELL_EDITOR=nano
 ARG SHELL_PAGER='less -R'
@@ -110,31 +114,43 @@ USER root
 RUN apt-get update -qy && apt-get install -qy ${DEV_TOOLS} \
  && apt-get -qy autoremove \
  && apt-get -qy clean all \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && echo "alias ll='ls -lAhF --color=auto'" >> /etc/bash.bashrc
+
+FROM dev-base as dev
+
+## Add entryopoint & config
+COPY entrypoint.sh /usr/local/bin/docker-entry
+COPY php-fpm.conf /etc/php/${PHP_VERSION}/fpm/
+COPY cli.ini /etc/php/${PHP_VERSION}/cli/conf.d/
+COPY fpm.ini /etc/php/${PHP_VERSION}/fpm/conf.d/
 
 RUN cp /usr/lib/php/${PHP_VERSION}/php.ini-development /etc/php/${PHP_VERSION}/fpm/php.ini \
- && cp /usr/lib/php/${PHP_VERSION}/php.ini-development /etc/php/${PHP_VERSION}/cli/php.ini \
- && echo "alias ll='ls -lAhF --color=auto'" >> /etc/bash.bashrc
+ && cp /usr/lib/php/${PHP_VERSION}/php.ini-development /etc/php/${PHP_VERSION}/cli/php.ini
 
 USER www-data
 
 ###########
 ## DEBUG ##
 ###########
-FROM dev as debug
+FROM dev-base as debug
 
-ARG PHP_VERSION
-
-USER root
+## Add entryopoint & config
+COPY entrypoint.sh /usr/local/bin/docker-entry
+COPY php-fpm.conf /etc/php/${PHP_VERSION}/fpm/
+COPY cli.ini /etc/php/${PHP_VERSION}/cli/conf.d/
+COPY fpm.ini /etc/php/${PHP_VERSION}/fpm/conf.d/
+COPY xdebug.ini /etc/php/${PHP_VERSION}/mods-available/
 
 RUN apt-get -qy update && apt-get -qy install php-pear php${PHP_VERSION}-dev \
  && pecl channel-update pecl.php.net && pecl install xdebug \
- && echo "zend_extension=$(find /usr/lib/php/ -name xdebug.so)" > /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
- && echo 'xdebug.mode=debug' >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini \
  && phpenmod xdebug \
 \
  && apt-get -qy autoremove \
  && apt-get -qy clean all \
  && rm -rf /var/lib/apt/lists/* \
+\
+ && cp /usr/lib/php/${PHP_VERSION}/php.ini-development /etc/php/${PHP_VERSION}/fpm/php.ini \
+ && cp /usr/lib/php/${PHP_VERSION}/php.ini-development /etc/php/${PHP_VERSION}/cli/php.ini
 
 USER www-data

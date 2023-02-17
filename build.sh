@@ -4,39 +4,31 @@ export DOCKER_BUILDKIT=1
 
 ## NGINX
 
-#REPO="${1-ajdinmore}/nginx"
-#docker pull nginx:alpine
-#printf "\n\n%s\n\n" "${REPO}"
-#docker build --tag "${REPO}" ./nginx/ || exit 1
-#docker push "${REPO}" || exit 2
+docker pull nginx:alpine
+printf "\n\n%s\n\n" "NGINX"
+docker-compose build nginx
+docker-compose push nginx
 
 ## PHP
 
 REPO="${1-ajdinmore}/php"
 DEBIAN_RELEASE='bullseye'
-PHP_VERSIONS=('8.0' '8.1' '8.2')
+PHP_VERSIONS=('8.2' '8.1' '8.0')
 TARGETS=('debug' 'dev' 'fpm')
-#TARGETS=('dev' 'fpm')
 
 docker pull "debian:${DEBIAN_RELEASE}-slim"
 
 for PHP_VERSION in "${PHP_VERSIONS[@]}"; do
     for TARGET in "${TARGETS[@]}"; do
 
-        TAG="${PHP_VERSION}-${TARGET}"
-        IMAGE="${REPO}:${TAG}"
+        export DEBIAN_RELEASE PHP_VERSION TARGET \
+            TAG="${PHP_VERSION}-${TARGET}" \
+            IMAGE="${REPO}:${TAG}"
 
-        printf "\n\n%s\n\n" "${IMAGE}"
+        printf "\n\n%s\n\n" "PHP $PHP_VERSION $TARGET"
 
-        docker build \
-            --target "${TARGET}" \
-            --build-arg "DEBIAN_RELEASE=${DEBIAN_RELEASE}" \
-            --build-arg "PHP_VERSION=${PHP_VERSION}" \
-            --tag "${IMAGE}" \
-            ./php/ \
-            || exit 3
-
-        docker push "${IMAGE}" || exit 2
+        docker-compose build php || exit 3
+        docker-compose push php || exit 2
 
     done
 

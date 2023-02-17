@@ -1,19 +1,21 @@
 version: '3.7'
 services:
     nginx:
-        image: ajdinmore/nginx
+        image: 'ajdinmore/nginx'
         tty:   true
-        volumes: [ ./test:/app/public ]
+        volumes: [ './test:/app/public' ]
         ports: [ '80:80' ]
         build:
-            context: ./nginx
+            context: './nginx'
 
     php:
-        image: ajdinmore/php:${PHP_VERSION:-8.2}-${TARGET:-fpm}
+        image: 'ajdinmore/php:${PHP_VERSION}-${TARGET}'
         tty:   true
-        volumes: [ ./test:/app/public ]
+        volumes: [ './test:/app/public' ]
+        extra_hosts: [ 'host.docker.internal:host-gateway' ]
         build:
-            context: ./php
-            target:  ${TARGET:-fpm}
+            context: './php'
+            target:  $TARGET
             args:
-                PHP_VERSION: ${PHP_VERSION:-8.2}
+                PHP_VERSION:    $PHP_VERSION
+                DEBIAN_RELEASE: 'bullseye'

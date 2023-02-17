@@ -60,7 +60,7 @@ E.g. `8.1-dev`
 ### Build Targets
 - `fpm` - standard/production
 - `dev` - dev config & tools
-- `debug` - as dev, with Xdebug (untested)
+- `debug` - as dev, with Xdebug
 
 ## Build Args
 
