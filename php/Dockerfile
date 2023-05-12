@@ -115,7 +115,10 @@ RUN apt-get update -qy && apt-get install -qy ${DEV_TOOLS} \
  && apt-get -qy autoremove \
  && apt-get -qy clean all \
  && rm -rf /var/lib/apt/lists/* \
- && echo "alias ll='ls -lAhF --color=auto'" >> /etc/bash.bashrc
+ && echo "alias ll='ls -lAhF --color=auto'" >> /etc/bash.bashrc \
+\
+## Allow sessions GC to be run by any user (by default, debian expects expired sessions to be cleared as a cron job)
+ && chmod a+r /var/lib/php/sessions
 
 FROM dev-base as dev
 

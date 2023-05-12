@@ -5,7 +5,9 @@
 
 Tweaked version of [standard Docker NGINX Image](https://hub.docker.com/_/nginx) for PHP applications.
 
-Currently, no SSL support; handle it in your load balancer.
+Served files will be accessed as user 101. 
+
+Currently, no SSL support.
 
 ## Paths
 
@@ -21,7 +23,7 @@ Currently, no SSL support; handle it in your load balancer.
 | `NGINX_PORT` | Port NGINX will listen on    | `80`            |
 | `NGINX_HOST` | Web server host              | `_` (all hosts) |
 | `NGINX_ROOT` | Web server root path         | `/app/public`   |
-| `PHP_HOST`   | Network host name of PHP-FPM | `php`           |
+| `PHP_HOST`   | Network host name of PHP-FPM | `app`           |
 | `PHP_PORT`   | Port to access PHP-FPM       | `9000`          |
 
 ---
@@ -68,8 +70,8 @@ E.g. `8.1-dev`
 |------------------|----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
 | `PHP_VERSION`    | Version of PHP-FPM to install                                                    | `8.1`                                                                                             |
 | `DEBIAN_RELEASE` | Debian release to base the image on                                              | `bullseye`                                                                                        |
-| `WWW_USER_ID`    | ID of the default `www-data` user                                                | `1000`                                                                                            |
-| `WWW_GROUP_ID`   | ID of the default user's `www-data` group                                        | `1000`                                                                                            |
+| `WWW_USER_ID`    | ID of PHP's default `www-data` user                                              | `1000`                                                                                            |
+| `WWW_GROUP_ID`   | ID of PHP's default user's `www-data` group                                      | `1000`                                                                                            |
 | `PHP_EXTENSIONS` | PHP extensions to install                                                        | `php-curl php-zip php-xml php-mbstring php-intl php-mysql php-pgsql php-redis php-imagick php-gd` |
 | `DEV_TOOLS`      | Utilities to install in the `dev` image                                          | `postgresql-client default-mysql-client iputils-ping dnsutils unzip nano less git man`            |
 | `COMPOSER_HOME`  | Path of the Composer "home" directory (location of cache & OAuth tokens)         | `/composer`                                                                                       |
