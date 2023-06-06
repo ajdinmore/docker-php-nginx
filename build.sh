@@ -36,5 +36,5 @@ for PHP_VERSION in "${PHP_VERSIONS[@]}"; do
     docker push "${REPO}:${PHP_VERSION}" || exit 2
 done
 
-docker tag "${REPO}:${PHP_VERSIONS[-1]}" "${REPO}:latest" || exit 4
+docker tag "${REPO}:${PHP_VERSIONS[0]}" "${REPO}:latest" || exit 4
 docker push "${REPO}:latest" || exit 2
